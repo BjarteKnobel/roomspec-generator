@@ -49,6 +49,29 @@ interface IConstant {
   innerwallsAddonShare: number
 }
 
+interface ISpaceResult {
+  netArea?: number
+  numberOfSeats?: number
+  numberOfRooms?: number
+  adjustedAreaInclCompensation?: number
+}
+
+interface ISpace {
+  name: string
+  result: ISpaceResult
+  spaces?: ISpace[]
+}
+
+interface ICalculationResult {
+  totals?: {
+    grossArea?: number
+    netArea?: number
+    dimensionedAttendance?: number
+    grossAreaPerEmployee?: number
+  }
+  spaces?: ISpace[]
+}
+
 export default function OfficeDesignApp() {
   const [variables, setVariables] = useState<IVariable>({
     accessToCanteen: true,
@@ -89,7 +112,7 @@ export default function OfficeDesignApp() {
     innerwallsAddonShare: 0.12,
   })
 
-  const [results, setResults] = useState<any>({
+  const [results, setResults] = useState<ICalculationResult>({
     totals: {
       workplaceArea: 3240.8,
       netArea: 4512.6,
@@ -123,7 +146,7 @@ export default function OfficeDesignApp() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
-      let data: any = null
+      let data: ICalculationResult | null = null
       try {
         data = await res.json()
       } catch {
@@ -135,7 +158,8 @@ export default function OfficeDesignApp() {
         setErrorMsg(null)
       } else {
         setIsLive(false)
-        setErrorMsg((data && (data.error || data.message)) || 'Calculation failed')
+        const errorData = data as unknown as { error?: string; message?: string }
+        setErrorMsg((errorData && (errorData.error || errorData.message)) || 'Calculation failed')
       }
     } finally {
       setIsCalculating(false)
@@ -312,30 +336,10 @@ export default function OfficeDesignApp() {
 
                     <div className="relative h-full grid grid-cols-4 grid-rows-4 gap-2 p-2">
                       {(() => {
-                        const getAllSpaces = (spaces: any[]): any[] => {
-                          if (!spaces) return []
-                          let allSpaces: any[] = []
-                          for (const space of spaces) {
-                            allSpaces.push(space)
-                            if (space.spaces) {
-                              allSpaces.push(...getAllSpaces(space.spaces))
-                            }
-                          }
-                          return allSpaces
-                        }
-                        
-                        const allSpaces = getAllSpaces(results.spaces || [])
-                        const findSpace = (name: string) => allSpaces.find((s: any) => s.name?.toLowerCase().includes(name.toLowerCase()))
-                        const getArea = (name: string) => {
-                          const space = findSpace(name)
-                          const area = space?.result?.netArea
-                          return area && area > 0 ? Math.round(area) : 0
-                        }
-                        
                         // For main areas, use the top-level area calculations
-                        const workArea = results.spaces?.find((s: any) => s.name?.includes('work related'))?.result?.netArea || 0
-                        const sharedArea = results.spaces?.find((s: any) => s.name?.includes('shared'))?.result?.netArea || 0
-                        const commonArea = results.spaces?.find((s: any) => s.name?.includes('common'))?.result?.netArea || 0
+                        const workArea = results.spaces?.find((s: ISpace) => s.name?.includes('work related'))?.result?.netArea || 0
+                        const sharedArea = results.spaces?.find((s: ISpace) => s.name?.includes('shared'))?.result?.netArea || 0
+                        const commonArea = results.spaces?.find((s: ISpace) => s.name?.includes('common'))?.result?.netArea || 0
                         
                         return (
                           <>
@@ -468,7 +472,7 @@ export default function OfficeDesignApp() {
                   <div className="space-y-4">
                     <h3 className="font-medium text-gray-700">Space Allocation</h3>
                     <div className="space-y-3">
-                      {(results.spaces ?? []).map((space: any, index: number) => (
+                      {(results.spaces ?? []).map((space: ISpace, index: number) => (
                         <Card key={index} className="p-4 hover:bg-muted/50 transition-colors">
                           <div className="flex items-center justify-between mb-3">
                             <h4 className="font-medium text-gray-700">{space.name}</h4>
