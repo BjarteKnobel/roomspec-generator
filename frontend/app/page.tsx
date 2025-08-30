@@ -66,8 +66,18 @@ interface ICalculationResult {
   totals?: {
     grossArea?: number
     netArea?: number
-    dimensionedAttendance?: number
+    utilityFloorSpace?: number
+    adjustedAreaInclCompensationWithAdjustmentAndCompensation?: number
+    unadjustedAddonArea?: number
+    workplaceArea?: number
+    compensationArea?: number
+    employeesPerWorkplaceTypeUnadjusted?: number
+    netAreaPerEmployee?: number
     grossAreaPerEmployee?: number
+    utilityFloorSpacePerEmployee?: number
+    grossAreaPerDimensionedAttendance?: number
+    grossNetFactor?: number
+    dimensionedAttendance?: number
   }
   spaces?: ISpace[]
 }

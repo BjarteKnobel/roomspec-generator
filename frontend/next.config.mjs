@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
   experimental: {
     externalDir: true,
     serverActions: {
