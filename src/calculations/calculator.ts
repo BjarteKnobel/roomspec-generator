@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs'
-import { join } from 'path'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import { ISpace } from './interfaces/space'
 import { IConfig } from './interfaces/config'
 import { ISpaceCalculation } from './interfaces/space_calculation'
@@ -39,7 +40,8 @@ export default class Calculator {
     this.variables = variables
     this.customSpaceConstants = customSpaceConstants
     this.customConstants = customConstants
-    this.config = JSON.parse(readFileSync(join(import.meta.dir, '..', `config/versions/${version}`,  configFile), 'utf-8'))
+    const baseDir = (import.meta as any)?.dir ?? dirname(fileURLToPath(import.meta.url))
+    this.config = JSON.parse(readFileSync(join(baseDir, '..', `config/versions/${version}`,  configFile), 'utf-8'))
     // Merge custom constants with the default constants
     this.constants = {
       ...this.config.constants,
