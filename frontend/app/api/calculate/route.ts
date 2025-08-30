@@ -4,6 +4,8 @@ import type { IRequest } from '../../../../src/calculations/interfaces/request'
 import type { IVariable } from '../../../../src/calculations/interfaces/variable'
 import type { IConstant } from '../../../../src/calculations/interfaces/constant'
 import type { TCustomSpaceConstants } from '../../../../src/calculations/types/custom_space_constant'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 export const runtime = 'nodejs'
 
@@ -14,11 +16,27 @@ export async function POST(req: Request) {
     const variables: IVariable = body.variables
     const customSpaceConstants: TCustomSpaceConstants | undefined = body.customSpaceConstants
     const customConstants: IConstant | undefined = body.customConstants
+    
+    // Debug: Check if config file exists
+    try {
+      const configPath = join(process.cwd(), 'src', 'config', 'versions', version, 'default.json')
+      console.log('Config path:', configPath)
+      const configExists = require('fs').existsSync(configPath)
+      console.log('Config exists:', configExists)
+      if (configExists) {
+        const configContent = readFileSync(configPath, 'utf-8')
+        console.log('Config size:', configContent.length)
+      }
+    } catch (debugErr) {
+      console.log('Debug error:', debugErr)
+    }
+    
     const calculator = new Calculator(variables, customSpaceConstants, customConstants, version)
     const result = calculator.result()
     return NextResponse.json({ ...result, version })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
+    console.error('Calculation error:', err)
     return NextResponse.json({ error: 'Calculation failed', message }, { status: 400 })
   }
 }
