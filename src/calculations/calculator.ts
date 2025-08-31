@@ -36,13 +36,26 @@ export default class Calculator {
    * @param {string} version – Version
    * @param {string} [configFile] – The config file to use
    */
-  constructor(variables: IVariable, customSpaceConstants: TCustomSpaceConstants|undefined, customConstants: IConstant|undefined, version: string, configFile: string = 'default.json') {
+  constructor(
+    variables: IVariable,
+    customSpaceConstants: TCustomSpaceConstants | undefined,
+    customConstants: IConstant | undefined,
+    version: string,
+    configFile: string = 'default.json',
+    configOverride?: IConfig,
+  ) {
     this.variables = variables
     this.customSpaceConstants = customSpaceConstants
     this.customConstants = customConstants
-    const metaAsRecord = import.meta as unknown as Record<string, unknown>
-    const baseDir = typeof metaAsRecord.dir === 'string' ? (metaAsRecord.dir as string) : dirname(fileURLToPath(import.meta.url))
-    this.config = JSON.parse(readFileSync(join(baseDir, '..', `config/versions/${version}`,  configFile), 'utf-8'))
+    if (configOverride) {
+      this.config = configOverride
+    } else {
+      const metaAsRecord = import.meta as unknown as Record<string, unknown>
+      const baseDir = typeof metaAsRecord.dir === 'string' ? (metaAsRecord.dir as string) : dirname(fileURLToPath(import.meta.url))
+      this.config = JSON.parse(
+        readFileSync(join(baseDir, '..', `config/versions/${version}`, configFile), 'utf-8')
+      )
+    }
     // Merge custom constants with the default constants
     this.constants = {
       ...this.config.constants,

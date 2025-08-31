@@ -4,8 +4,7 @@ import type { IRequest } from '../../../../src/calculations/interfaces/request'
 import type { IVariable } from '../../../../src/calculations/interfaces/variable'
 import type { IConstant } from '../../../../src/calculations/interfaces/constant'
 import type { TCustomSpaceConstants } from '../../../../src/calculations/types/custom_space_constant'
-import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
+import configV1 from '../../../../src/config/versions/1/default.json' assert { type: 'json' }
 
 export const runtime = 'nodejs'
 
@@ -17,23 +16,7 @@ export async function POST(req: Request) {
     const customSpaceConstants: TCustomSpaceConstants | undefined = body.customSpaceConstants
     const customConstants: IConstant | undefined = body.customConstants
     
-    // Debug: Check if config file exists
-    try {
-      // In Vercel, the function cwd will be the "frontend" directory.
-      // Our configs live one level up in ../src/config/versions/<version>/default.json
-      const configPath = join(process.cwd(), '..', 'src', 'config', 'versions', version, 'default.json')
-      console.log('Config path:', configPath)
-      const configExists = existsSync(configPath)
-      console.log('Config exists:', configExists)
-      if (configExists) {
-        const configContent = readFileSync(configPath, 'utf-8')
-        console.log('Config size:', configContent.length)
-      }
-    } catch (debugErr) {
-      console.log('Debug error:', debugErr)
-    }
-    
-    const calculator = new Calculator(variables, customSpaceConstants, customConstants, version)
+    const calculator = new Calculator(variables, customSpaceConstants, customConstants, version, 'default.json', configV1)
     const result = calculator.result()
     return NextResponse.json({ ...result, version })
   } catch (err: unknown) {
