@@ -18,13 +18,18 @@ export async function POST(req: Request) {
     const customConstants: IConstant | undefined = body.customConstants
     
     const configOverride = configV1 as unknown as IConfig
+    console.log('Config spaces count:', configOverride.spaces?.length)
+    console.log('First space:', configOverride.spaces?.[0]?.name)
+    
     const calculator = new Calculator(variables, customSpaceConstants, customConstants, version, 'default.json', configOverride)
     const result = calculator.result()
     return NextResponse.json({ ...result, version })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
+    const stack = err instanceof Error ? err.stack : undefined
     console.error('Calculation error:', err)
-    return NextResponse.json({ error: 'Calculation failed', message }, { status: 400 })
+    console.error('Error stack:', stack)
+    return NextResponse.json({ error: 'Calculation failed', message, stack }, { status: 400 })
   }
 }
 
