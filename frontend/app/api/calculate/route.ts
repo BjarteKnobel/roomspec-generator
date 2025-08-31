@@ -5,6 +5,7 @@ import type { IVariable } from '../../../../src/calculations/interfaces/variable
 import type { IConstant } from '../../../../src/calculations/interfaces/constant'
 import type { TCustomSpaceConstants } from '../../../../src/calculations/types/custom_space_constant'
 import configV1 from '../../../../src/config/versions/1/default.json' assert { type: 'json' }
+import type { IConfig } from '../../../../src/calculations/interfaces/config'
 
 export const runtime = 'nodejs'
 
@@ -16,7 +17,8 @@ export async function POST(req: Request) {
     const customSpaceConstants: TCustomSpaceConstants | undefined = body.customSpaceConstants
     const customConstants: IConstant | undefined = body.customConstants
     
-    const calculator = new Calculator(variables, customSpaceConstants, customConstants, version, 'default.json', configV1)
+    const configOverride = configV1 as unknown as IConfig
+    const calculator = new Calculator(variables, customSpaceConstants, customConstants, version, 'default.json', configOverride)
     const result = calculator.result()
     return NextResponse.json({ ...result, version })
   } catch (err: unknown) {
