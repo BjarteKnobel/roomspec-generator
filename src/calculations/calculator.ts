@@ -138,6 +138,13 @@ export default class Calculator {
   }
 
   /**
+   * Skip invalid space entries that may appear after JSON import/bundling
+   */
+  #isValidSpace(space: ISpace | undefined): space is ISpace {
+    return Boolean(space && typeof space.name === 'string')
+  }
+
+  /**
    * This method is used to add a custom space to the result, for example corridors and inner walls, which are not really spaces
    * @param {string} name - The name of the space
    * @param {ISpaceResult} result - The result of the space
@@ -288,6 +295,7 @@ export default class Calculator {
    */
   #processSpacesFirst(spaces: ISpace[]): ISpace[] {
     for (const space of spaces) {
+      if (!this.#isValidSpace(space)) continue
       // If this space has nested spaces, process those
       if (space.spaces) {
         this.#processSpacesFirst(space.spaces)
@@ -305,6 +313,7 @@ export default class Calculator {
    */
   #processSpacesSecond(spaces: ISpace[]): ISpace[] {
     for (const space of spaces) {
+      if (!this.#isValidSpace(space)) continue
       // If this space has nested spaces, process those
       if (space.spaces) {
         this.#processSpacesSecond(space.spaces)
@@ -326,6 +335,7 @@ export default class Calculator {
    */
   #processSpacesThird(spaces: ISpace[]): ISpace[] {
     for (const space of spaces) {
+      if (!this.#isValidSpace(space)) continue
       // If this space has nested spaces, process those
       if (space.spaces) {
         this.#processSpacesThird(space.spaces)
@@ -346,6 +356,7 @@ export default class Calculator {
    */
   #processSpacesFourth(spaces: ISpace[]): ISpace[] {
     for (const space of spaces) {
+      if (!this.#isValidSpace(space)) continue
       // If this space has nested spaces, process those
       if (space.spaces) {
         this.#processSpacesFourth(space.spaces)
