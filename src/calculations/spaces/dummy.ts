@@ -23,7 +23,7 @@ export default class Dummy extends MainSpace {
         adhereToGovernmentMinimum: false
       }
     }
-    super(variables, config)
+    super(variables, config, undefined, undefined, space)
     this.name = this.space.name
     this.space = space
     this.spaceConstants = space.constants

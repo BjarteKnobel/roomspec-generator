@@ -6,6 +6,7 @@ import { IConstant } from '../interfaces/constant'
 import { IVariable } from '../interfaces/variable'
 import { findSpace } from '../helpers'
 import { TCustomSpaceConstants } from '../types/custom_space_constant'
+import getSpace from './index'
 
 /**
  * This is the main class for the spaces. It contains shared methods for all spaces.
@@ -30,7 +31,28 @@ export default class MainSpace implements ISpaceCalculation {
    */
   constructor(variables: IVariable, config: IConfig, customSpaceConstants?: TCustomSpaceConstants, customConstants?: IConstant, space?: ISpace) {
     if (!space) {
-      const foundSpace = findSpace(this.constructor.name, config.spaces)
+      // First, try by class name (works locally/non-minified)
+      let foundSpace = findSpace(this.constructor.name, config.spaces)
+      // If not found, fall back to matching via getSpace mapping (works in minified builds)
+      if (!foundSpace) {
+        const targetCtor = (this as unknown as { constructor: unknown }).constructor
+        const findByCtor = (spaces: ISpace[]): ISpace|undefined => {
+          for (const s of spaces) {
+            if (s.spaces && s.spaces.length) {
+              const nested = findByCtor(s.spaces)
+              if (nested) return nested
+            }
+            try {
+              const Ctor = getSpace(s.name)
+              if (Ctor === targetCtor) return s
+            } catch {
+              // Names without a concrete class mapping will throw; ignore
+            }
+          }
+          return undefined
+        }
+        foundSpace = findByCtor(config.spaces)
+      }
       if (!foundSpace) {
         throw new Error(`Space class ${this.constructor.name} not found in config`)
       }
