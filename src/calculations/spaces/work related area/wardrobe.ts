@@ -1,5 +1,6 @@
 import MainSpace from '../main_space_class'
 import SharedWardrobe from '../shared area/wardrobe'
+import { findSpaceByClassName } from '../../helpers'
 
 export default class WorkWardrobe extends MainSpace {
   /**
@@ -7,7 +8,8 @@ export default class WorkWardrobe extends MainSpace {
    * @returns {number}
    */
   calculateAreaExclCompensation (): number {
-    const sharedWardrobe = new SharedWardrobe(this.variables, this.config, this.customSpaceConstants, this.customConstants)
+    const sharedSpace = findSpaceByClassName('SharedWardrobe', this.config.spaces)
+    const sharedWardrobe = new SharedWardrobe(this.variables, this.config, this.customSpaceConstants, this.customConstants, sharedSpace)
     return this.dimensionedAttendance() * this.areaPerPersonExcludingCorridor() - sharedWardrobe.calculateAreaExclCompensation()
   }
 }

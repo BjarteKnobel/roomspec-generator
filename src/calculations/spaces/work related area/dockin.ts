@@ -1,5 +1,6 @@
 import MainSpace from '../main_space_class'
 import SharedDockin from '../shared area/dockin'
+import { findSpaceByClassName } from '../../helpers'
 
 export default class WorkDockin extends MainSpace {
   /**
@@ -8,7 +9,8 @@ export default class WorkDockin extends MainSpace {
    */
   sharePerWorkspaceType (): number {
     // We need the shared dock in share for the calculation of the work dock in share
-    const sharedDockin = new SharedDockin(this.variables, this.config, this.customSpaceConstants, this.customConstants)
+    const sharedSpace = findSpaceByClassName('SharedDockin', this.config.spaces)
+    const sharedDockin = new SharedDockin(this.variables, this.config, this.customSpaceConstants, this.customConstants, sharedSpace)
     return this.variables.dockinShare - sharedDockin.sharePerWorkspaceType()
   }
 

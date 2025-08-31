@@ -4,7 +4,7 @@ import { ISpaceConstant } from '../interfaces/space_constant'
 import { ISpaceCalculation } from '../interfaces/space_calculation'
 import { IConstant } from '../interfaces/constant'
 import { IVariable } from '../interfaces/variable'
-import { findSpace } from '../helpers'
+import { findSpace, findSpaceByClassName } from '../helpers'
 import { TCustomSpaceConstants } from '../types/custom_space_constant'
 import getSpace from './index'
 
@@ -52,6 +52,10 @@ export default class MainSpace implements ISpaceCalculation {
           return undefined
         }
         foundSpace = findByCtor(config.spaces)
+        // Final fallback: use config className to match
+        if (!foundSpace) {
+          foundSpace = findSpaceByClassName((this as unknown as { constructor: { name: string }}).constructor.name, config.spaces)
+        }
       }
       if (!foundSpace) {
         throw new Error(`Space class ${this.constructor.name} not found in config`)

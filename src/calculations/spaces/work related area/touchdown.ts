@@ -1,5 +1,6 @@
 import MainSpace from '../main_space_class'
 import SharedTouchdown from '../shared area/touchdown'
+import { findSpaceByClassName } from '../../helpers'
 
 export default class WorkTouchdown extends MainSpace {
   /**
@@ -8,7 +9,8 @@ export default class WorkTouchdown extends MainSpace {
    */
   sharePerWorkspaceType (): number {
     // We need the shared touchdown share for the calculation of the work touchdown share
-    const sharedTouchdown = new SharedTouchdown(this.variables, this.config, this.customSpaceConstants, this.customConstants)
+    const sharedSpace = findSpaceByClassName('SharedTouchdown', this.config.spaces)
+    const sharedTouchdown = new SharedTouchdown(this.variables, this.config, this.customSpaceConstants, this.customConstants, sharedSpace)
     return this.variables.touchdownShare - sharedTouchdown.sharePerWorkspaceType()
   }
 
