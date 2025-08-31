@@ -4,7 +4,7 @@ import type { IRequest } from '../../../../src/calculations/interfaces/request'
 import type { IVariable } from '../../../../src/calculations/interfaces/variable'
 import type { IConstant } from '../../../../src/calculations/interfaces/constant'
 import type { TCustomSpaceConstants } from '../../../../src/calculations/types/custom_space_constant'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 export const runtime = 'nodejs'
@@ -19,9 +19,11 @@ export async function POST(req: Request) {
     
     // Debug: Check if config file exists
     try {
-      const configPath = join(process.cwd(), 'src', 'config', 'versions', version, 'default.json')
+      // In Vercel, the function cwd will be the "frontend" directory.
+      // Our configs live one level up in ../src/config/versions/<version>/default.json
+      const configPath = join(process.cwd(), '..', 'src', 'config', 'versions', version, 'default.json')
       console.log('Config path:', configPath)
-      const configExists = require('fs').existsSync(configPath)
+      const configExists = existsSync(configPath)
       console.log('Config exists:', configExists)
       if (configExists) {
         const configContent = readFileSync(configPath, 'utf-8')
