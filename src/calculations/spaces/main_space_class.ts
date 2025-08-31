@@ -30,7 +30,13 @@ export default class MainSpace implements ISpaceCalculation {
    */
   constructor(variables: IVariable, config: IConfig, customSpaceConstants?: TCustomSpaceConstants, customConstants?: IConstant, space?: ISpace) {
     if (!space) {
-      space = findSpace(this.constructor.name, config.spaces)!
+      space = findSpace(this.constructor.name, config.spaces)
+      if (!space) {
+        throw new Error(`Space class ${this.constructor.name} not found in config`)
+      }
+    }
+    if (!space.name) {
+      throw new Error(`Space object is missing required 'name' property`)
     }
     this.name = space.name
     this.space = space
